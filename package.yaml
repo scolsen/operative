@@ -1,0 +1,58 @@
+# This YAML file describes your package. Stack will automatically generate a
+# Cabal file when you run `stack build`. See the hpack website for help with
+# this file: <https://github.com/sol/hpack>.
+benchmarks:
+  minParse-benchmarks:
+    dependencies:
+    - base
+    - minParse
+    - criterion
+    ghc-options:
+    - -rtsopts
+    - -threaded
+    - -with-rtsopts=-N
+    main: Main.hs
+    source-dirs: benchmark
+category: Other
+description: minParse: simple wrapper around getOpts.
+executables:
+  minParse:
+    dependencies:
+    - base
+    - minParse
+    ghc-options:
+    - -rtsopts
+    - -threaded
+    - -with-rtsopts=-N
+    main: Main.hs
+    source-dirs: executable
+extra-source-files:
+- CHANGELOG.md
+- LICENSE.md
+- package.yaml
+- README.md
+- stack.yaml
+ghc-options: -Wall
+github: scolsen/minParse
+library:
+  dependencies:
+  - base
+  source-dirs: library
+license: MIT
+maintainer: Author name here
+name: minParse
+synopsis: A new Haskeleton package.
+tests:
+  minParse-test-suite:
+    dependencies:
+    - base
+    - minParse
+    - tasty
+    - tasty-hspec
+    ghc-options:
+    - -rtsopts
+    - -threaded
+    - -with-rtsopts=-N
+    main: Main.hs
+    source-dirs: test-suite
+version: '1.0.0'
