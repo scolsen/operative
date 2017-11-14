@@ -1,33 +1,34 @@
 # [minParse][]
 
+MinParse is a small wrapper around the System.Console.getOpt module. It's goal is to reduce some of the boilerplate involved in a traditional use of get opt. Typically, one has to either define a data type to represent getOpt flags, or use record syntax to do so. MinParse provides a prebaked, but flexible data type Flag to bypass this.
+
+## Types
+
+MinParse exposes the following type definitions:
+
+### Identifiers
+
+Definition: `data Identifiers = Identifiers [Char] [String]`
+Derivations: `deriving(Eq, Show)`
+
+The Identifiers data type is used to maintain a refernce to the [Char] and [String] option identifiers passed to getOpt. It's necessary to maintain this information on the Flag data type in order to preserve an association between the a named option and the values it is passed at runtime. 
+
+### Flag
+
+Definition: ```haskell
+            data Flag = Verbose
+                      | Help String
+                      | Version String
+                      | Flg Identifiers Bool
+                      | Opt Identifiers String
+            ```
+Derivations: `deriving(Eq, Show)`
+
 Thanks for starting a project with Haskeleton! If you haven't heard of it
 before, I suggest reading the introductory blog post. You can find it here:
 <http://taylor.fausak.me/2014/03/04/haskeleton-a-haskell-project-skeleton/>.
 
-Before you get started, there are a few things that this template couldn't
-provide for you. You should:
 
--   Add a synopsis to `package.yaml`. It should be a short (one sentence)
-    explanation of your project.
-
--   Add a description to `package.yaml`. This can be whatever you want it to
-    be.
-
--   Add a category to `package.yaml`. A list of categories is available on
-    Hackage at <http://hackage.haskell.org/packages>.
-
--   Rename `library/Example.hs` to whatever you want your top-level module to
-    be called. Typically this is the same as your package name but in
-    `CamelCase` instead of `kebab-case`.
-
-    -   Don't forget to rename the reference to it in
-        `executable/Main.hs`!
-
--   If you are on an older version of Stack (<1.0.4), delete `package.yaml` and
-    remove `/*.cabal` from your `.gitignore`.
-
-Once you've done that, start working on your project with the Stack commands
-you know and love.
 
 ``` sh
 # Build the project.
@@ -45,4 +46,4 @@ stack haddock
 
 Thanks again, and happy hacking!
 
-[minParse]: https://github.com/githubuser/minParse
+[minParse]: https://github.com/scolsen/minParse 
