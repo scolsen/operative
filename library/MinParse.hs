@@ -1,6 +1,7 @@
 module MinParse (
                   Identifiers(..),
                   Flag(..),
+                  OptionGenerator(..),
                   Parsed,
                   parse,
                   getParsed,
@@ -20,32 +21,38 @@ module MinParse (
                   optArg,
                   reqArg,
                   noArg,
+                  option,
+                  params,
+                  help,
+                  version,
                   putVersion,
                   putHelp,
                   displayHelp,
-                  displayVersion
+                  displayVersion,
+                  info
                 ) where
 
-import System.IO
-import System.Environment
-import System.Exit
-import System.Console.GetOpt
-import Control.Monad
-import Data.Maybe
+import System.IO 
+import System.Environment 
+import System.Exit 
+import System.Console.GetOpt 
+import Control.Monad 
+import Data.Maybe 
 import Data.List
 import Data.Maybe
 
-data Identifiers = Identifiers [Char] [String]
-                    deriving(Eq, Show)
-unIdentifiers :: Identifiers -> ([Char], [String])
-unIdentifiers (Identifiers a b) = (a, b)
+data OptionGenerator = Params {
+                                   charIdens :: [Char],
+                                   stringIdens :: [String],
+                                   usage :: String,
+                                   defaultArg :: String,
+                                   argType :: String -- Printed using getOpt's usageInfo 
+                              }
+                              deriving Show
+-- param updater/defaults
+params = Params {charIdens = [], stringIdens = [], usage = undefined, defaultArg = "", argType = ""}
 
-unIdenChar :: Identifiers -> [Char]
-unIdenChar (Identifiers a _) = a
-
-unIdenStr :: Identifiers -> [String]
-unIdenStr (Identifiers _ a) = a
-
+data Identifiers = Identifiers [Char] [String] deriving(Eq, Show)
 data Flag = Verbose 
           | Help String
           | Version String
@@ -107,27 +114,50 @@ getIdentifiers (Flg i _) = i
 getIdentifiers _         = Identifiers [] []
 
 hasIdentifier :: Flag -> (Maybe Char, Maybe String) -> Bool
-hasIdentifier (Opt i _) (Just a, Just b) = or ((any (a ==) (unIdenChar i)):(any (b ==) (unIdenStr i)):[])
-hasIdentifier (Opt i _) (Nothing, Just b)        = or (False:(any (b ==) (unIdenStr i)):[])
-hasIdentifier (Opt i _) (Just a, Nothing)        = or ((any (a ==) (unIdenChar i)):False:[])
-hasIdentifier (Flg i _) (Just a, Just b) = or ((any (a ==) (unIdenChar i)):(any (b ==) (unIdenStr i)):[])
-hasIdentifier (Flg i _) (Nothing, Just b)        = or (False:(any (b ==) (unIdenStr i)):[])
-hasIdentifier (Flg i _) (Just a, Nothing)        = or ((any (a ==) (unIdenChar i)):False:[])
+hasIdentifier (Opt i _) (Just a, Just b)  = or ((any (a ==) (unIdenChar i)):(any (b ==) (unIdenStr i)):[])
+hasIdentifier (Opt i _) (Nothing, Just b) = or (False:(any (b ==) (unIdenStr i)):[])
+hasIdentifier (Opt i _) (Just a, Nothing) = or ((any (a ==) (unIdenChar i)):False:[])
+hasIdentifier (Flg i _) (Just a, Just b)  = or ((any (a ==) (unIdenChar i)):(any (b ==) (unIdenStr i)):[])
+hasIdentifier (Flg i _) (Nothing, Just b) = or (False:(any (b ==) (unIdenStr i)):[])
+hasIdentifier (Flg i _) (Just a, Nothing) = or ((any (a ==) (unIdenChar i)):False:[])
 
 -- Identifiers
-optArg :: [Char] -> [String] -> String -> String -> String -> OptDescr Flag
-optArg c s def alt use = 
-    Option c s (OptArg (Opt (Identifiers c s) . fromMaybe def) alt) use
+unIdentifiers :: Identifiers -> ([Char], [String])
+unIdentifiers (Identifiers a b) = (a, b)
 
-reqArg :: [Char] -> [String] -> String -> String -> OptDescr Flag
-reqArg c s alt use = 
-    Option c s (ReqArg (Opt (Identifiers c s)) alt) use
+unIdenChar :: Identifiers -> [Char]
+unIdenChar (Identifiers a _) = a
 
-noArg :: [Char] -> [String] -> Bool -> String -> OptDescr Flag
-noArg c s def use = 
-    Option c s (NoArg (Flg (Identifiers c s) def)) use
+unIdenStr :: Identifiers -> [String]
+unIdenStr (Identifiers _ a) = a
+
+-- OptionGenerator
+optArg :: OptionGenerator -> OptDescr Flag
+optArg args =
+    _optArg (charIdens args) (stringIdens args) (defaultArg args) (argType args) (usage args)
+
+reqArg :: OptionGenerator -> OptDescr Flag
+reqArg args =
+    _reqArg (charIdens args) (stringIdens args) (argType args) (usage args)
+
+noArg :: OptionGenerator -> OptDescr Flag
+noArg args =
+    _noArg (charIdens args) (stringIdens args) True (usage args)
+
+option :: OptionGenerator -> OptDescr Flag -- determine option to use based on record contents
+option x 
+    | (defaultArg x) /= "" = optArg x
+    | (argType x) /= ""    = reqArg x
+    | otherwise            = noArg x 
+
 
 -- Display
+help :: String -> OptDescr Flag
+help x = Option ['h'] ["help"] (NoArg (Help x)) "Help"
+
+version :: String -> OptDescr Flag
+version x = Option ['V'] ["version"] (NoArg (Version x)) "Version"
+
 putHelp :: Maybe Flag -> IO ()
 putHelp (Just (Help a)) = putStrLn a >> exitWith(ExitFailure 1)
 putHelp Nothing         = putStrLn "No help documentation provided."
@@ -141,4 +171,22 @@ displayHelp (a, _) x = putHelp (find (== Help x) a)
 
 displayVersion :: Parsed -> String -> IO ()
 displayVersion (a, _) x = putVersion (find (== Version x) a)
+
+-- synonyms 
+info :: String -> [OptDescr Flag] -> String
+info x y = usageInfo x y
+
+-- Private
+-- unwrap records to construct getOpt items
+_optArg :: [Char] -> [String] -> String -> String -> String -> OptDescr Flag
+_optArg c s def alt use = 
+    Option c s (OptArg (Opt (Identifiers c s) . fromMaybe def) alt) use
+
+_reqArg :: [Char] -> [String] -> String -> String -> OptDescr Flag
+_reqArg c s alt use = 
+    Option c s (ReqArg (Opt (Identifiers c s)) alt) use
+
+_noArg :: [Char] -> [String] -> Bool -> String -> OptDescr Flag
+_noArg c s def use = 
+    Option c s (NoArg (Flg (Identifiers c s) def)) use
 
