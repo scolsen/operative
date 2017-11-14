@@ -3,4 +3,4 @@ import qualified MinParse as MP
 
 main :: IO ()
 main = MP.parseArgs
-     >>= print
+       >>= print
