@@ -15,13 +15,14 @@ The Identifiers data type is used to maintain a refernce to the [Char] and [Stri
 
 ### Flag
 
-Definition: ```haskell
-            data Flag = Verbose
-                      | Help String
-                      | Version String
-                      | Flg Identifiers Bool
-                      | Opt Identifiers String
-            ```
+Definition: 
+```haskell
+    data Flag = Verbose
+              | Help String
+              | Version String
+              | Flg Identifiers Bool
+              | Opt Identifiers String
+```
 Derivations: `deriving(Eq, Show)`
 
 Thanks for starting a project with Haskeleton! If you haven't heard of it
