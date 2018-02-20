@@ -1,7 +1,7 @@
 #!/usr/bin/env stack
 -- stack --resolver lts-6.25 script
 
-import qualified MinParse as MP
+import qualified Operative as O
 
 -- Use record syntax to define optons.
 
@@ -14,6 +14,6 @@ options = [
 
 rvrs = map reverse
 
-main = MP.parseArgs options
-       >>= return (rvrs (MP.getArgByIden parsed "reverse"))
+main = O.parseArgs options
+       >>= return (rvrs (O.getArgByIden parsed "reverse"))
        >>= print

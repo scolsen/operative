@@ -1,4 +1,4 @@
-module MinParse (
+module Operative (
                   Identifiers(..),
                   Flag(..),
                   OptionGenerator(..),

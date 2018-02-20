@@ -1,6 +1,6 @@
--- Example use of MinParse
-import qualified MinParse as MP
+-- Example use of Operative
+import qualified Operative as O
 
 main :: IO ()
-main = MP.parseArgs
+main = O.parseArgs
        >>= print

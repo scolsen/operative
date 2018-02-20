@@ -1,10 +1,10 @@
-# [minParse][]
+# [operative][]
 
-MinParse is a small wrapper around the System.Console.getOpt module. It's goal is to reduce some of the boilerplate involved in a traditional use of get opt. Typically, one has to either define a data type to represent getOpt flags, or use record syntax to do so. MinParse provides a prebaked, but flexible data type Flag to bypass this.
+Operative is a small wrapper around the System.Console.getOpt module. It's goal is to reduce some of the boilerplate involved in a traditional use of get opt. Typically, one has to either define a data type to represent getOpt flags, or use record syntax to do so. Operative provides a prebaked, but flexible data type Flag to bypass this.
 
 ## Data
 
-MinParse exposes the following data definitions:
+Operative exposes the following data definitions:
 
 ### Identifiers
 
@@ -49,4 +49,4 @@ The OptionGenerator is exposed for convenience, and can be used to construct an 
 
 
 
-[minParse]: https://github.com/scolsen/minParse 
+[operative]: https://github.com/scolsen/operative 
