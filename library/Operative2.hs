@@ -1,3 +1,5 @@
+import qualified Data.List as L
+
 data Identifiers = Identifiers Char String
 
 data Option = Flag Identifiers Bool
@@ -16,7 +18,15 @@ data Program = Spec {
 data Argument = Valid String [String]
               | Invalid String [String]
 
-parse :: Program -> [String] -> [Argument]
+getOptions :: IO [String]
+getOptions = liftM (filter $ L.isPrefixOf "-") getArgs
+
+programOptions :: Program -> [Option]
+programOptions p = options p
+
+parse :: Program -> IO [String] -> [Argument]
+parse p = getOptions
+          >>= print
 
 valid? :: Argument -> Bool
 valid? (Valid _ _) = True
